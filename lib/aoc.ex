@@ -324,7 +324,7 @@ defmodule Aoc do
     overlapping_intervals = Enum.filter(ordered_disjoint_intervals, fn {test_st, test_ed} -> test_ed >= rng_st and test_st <= rng_ed end)
 
     overlapping_resolved = resolve5b(overlapping_intervals, {rng_st, rng_ed})
-   
+
     before_intervals ++ overlapping_resolved ++ after_intervals
   end
 
@@ -344,6 +344,34 @@ defmodule Aoc do
     final_disjoint_intervals = Enum.reduce(ranges, initial_disjoint_intervals, &red5b/2)
 
     Enum.sum(for {st, ed} <- final_disjoint_intervals, do: ed - st + 1)
+
+    :ok
+  end
+
+  def solve6 do
+    lines = File.stream!("priv/inputs/input6.txt")
+    |> Stream.map(&String.trim/1)
+    |> Stream.map(&String.split/1)
+
+    # The file is layed out like
+    # 1 2 3 4 5
+    # 1 2 3 4 5
+    # 1 2 3 4 5
+    # * + * + +
+
+    problems = Enum.zip(lines) |> Enum.map(&Tuple.to_list/1)
+
+    answers = Enum.map(problems, fn problem ->
+      operator = Enum.at(problem, -1)
+      operands = Enum.map(Enum.slice(problem, 0..-2//1), &String.to_integer/1)
+      case operator do
+        "+" -> Enum.sum(operands)
+        "*" -> Enum.product(operands)
+        _ -> raise "unknown operator: #{operator}, operands: #{inspect(operands)}"
+      end
+    end)
+
+    Enum.sum(answers)
 
     :ok
   end
